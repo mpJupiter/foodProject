@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+     <constant name="struts.i18n.encoding" value="utf-8"/>
+     <constant name="struts.devMode" value="true" />
+     <!--Struts2中Action对象的创建交给spring完成-->
+     <constant name="struts.objectFactory" value="spring" />   
+       
+     <package name="default" extends="struts-default">
+         <!-- 配置一个拦截器 -->
+           <interceptors>
+            <interceptor name="LoginInterceptors" class="com.food.util.LoginInterceptors">
+              <param name="excludeName" >customer_login,customer_register</param>
+              <param name="sessionName">customer</param>
+           </interceptor>
+           <interceptor-stack name="myInterceptors">
+             <interceptor-ref name="defaultStack"></interceptor-ref>
+             <interceptor-ref name="LoginInterceptors"></interceptor-ref>
+           </interceptor-stack>
+           </interceptors>
+           
+           <default-interceptor-ref name="myInterceptors"></default-interceptor-ref> 
+           
+           <global-results>
+               <result name="login" type="redirect">/login.jsp</result>
+               <result name="success" type="redirect">${prePage}</result>
+           </global-results>
+     </package>
+       
+	 <package name="food" namespace="/food" extends="default">
+	        <action name="food_*" class="foodAction" method="{1}">
+	        	<result name="show_view">/main.jsp</result>
+	        	<result name="message">/message.jsp</result>
+	        	<result name="detail_view">/detail.jsp</result>
+	         	<result name="edit_view">/edit.jsp</result>
+	        	<result name="edit_meaasge">/edit_message.jsp</result>
+	        	<result name="delete_message">/delete_message.jsp</result>
+	        </action>  
+	 </package>
+	 
+         <!-- CustomerAction配置 -->
+         <package name="customer" namespace="/customer" extends="default">
+           <action name="customer_*" class="customerAction" method="{1}">
+             <result name="show_view" type="chain">
+              <param name="actionName">food_showFood</param>
+             <param name="namespace">/food</param>
+             <param name="paraml">${customer.name}</param>
+             </result>
+             <result name="input">/login.jsp</result>
+            </action>
+         </package>
+
+    <package name="order" namespace="/order" extends="default">
+	        <action name="order_*" class="orderAction" method="{1}">
+	        	<result name="show_view">/order_message.jsp</result>
+	        	<result name="order_message">/order_main.jsp</result>
+	        	<result name="detail_view">/order_detail.jsp</result>
+ 	        </action>  
+	 </package>
+ 	  
+	 
+</struts>
